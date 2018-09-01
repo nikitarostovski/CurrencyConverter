@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { ScrollView, StatusBar, Platform } from 'react-native';
 import Icon from 'react-native-ionicons'
+import PropTypes from 'prop-types';
 import { ListItem, Separator } from '../components/List';
 import EStyleSheet from 'react-native-extended-stylesheet';
 
@@ -16,8 +17,12 @@ const styles = EStyleSheet.create({
 
 class Themes extends Component {
 
+    static propTypes = {
+        navigation: PropTypes.object,
+    };
+
     handleThemeTap(color) {
-        console.log("Theme ", color);
+        this.props.navigation.goBack(null);
     }
 
     render() {
