@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { KeyboardAvoidingView, StatusBar } from 'react-native';
+import { connect } from 'react-redux';
 
 import { Container } from '../components/Container';
 import { Logo } from '../components/Logo';
@@ -8,10 +9,8 @@ import { InputWithButton } from '../components/TextInput';
 import { ClearButton } from '../components/Buttons';
 import { LastConverted } from '../components/Text';
 import { Header } from '../components/Header';
+import { swapCurrency, changeCurrencyAmount } from '../actions/currencies';
 
-const TEMP_BASE_CURRENCY = 'USD';
-const TEMP_QUOTE_CURRENCY = 'RUB';
-const TEMP_BASE_PRICE = '10';
 const TEMP_QUOTE_PRICE = '679';
 const TEMP_CONVERSION_RATE = 67.9;
 const TEMP_CONVERSION_DATE = new Date();
@@ -20,6 +19,10 @@ class Home extends Component {
 
     static propTypes = {
         navigation: PropTypes.object,
+        dispatch: PropTypes.func,
+        baseCurrency: PropTypes.string,
+        quoteCurrency: PropTypes.string,
+        amount: PropTypes.number,
     }
 
     handlePressBaseCurrency = () => {
@@ -31,11 +34,11 @@ class Home extends Component {
     }
 
     handleTextChange = (text) => {
-        console.log("text changed", text);
+        this.props.dispatch(changeCurrencyAmount(text));
     }
 
     handlePressReverseCurrencies = () => {
-        console.log("reverse");
+        this.props.dispatch(swapCurrency());
     }
 
     handlePressSettings = () => {
@@ -52,20 +55,20 @@ class Home extends Component {
                 <KeyboardAvoidingView behavior="padding">
                     <Logo />
                     <InputWithButton
-                        defaultValue={TEMP_BASE_PRICE}
-                        buttonText={TEMP_BASE_CURRENCY}
+                        defaultValue={this.props.amount.toString()}
+                        buttonText={this.props.baseCurrency}
                         onPress={this.handlePressBaseCurrency}
                         onChangeText={this.handleTextChange}
                         keyboardType="numeric"
                     />
                     <InputWithButton
-                        buttonText={TEMP_QUOTE_CURRENCY}
+                        buttonText={this.props.quoteCurrency}
                         onPress={this.handlePressQuoteCurrency}
                         editable={false}
                     />
                     <LastConverted
-                        base={TEMP_BASE_CURRENCY}
-                        quote={TEMP_QUOTE_CURRENCY}
+                        base={this.props.baseCurrency}
+                        quote={this.props.quoteCurrency}
                         conversionRate={TEMP_CONVERSION_RATE}
                         date={TEMP_CONVERSION_DATE}
                     />
@@ -79,4 +82,16 @@ class Home extends Component {
 
 }
 
-export default Home;
+const mapStateToProps = (state) => {
+    const baseCurrency = state.currencies.baseCurrency;
+    const quoteCurrency = state.currencies.quoteCurrency;
+    const amount = state.currencies.amount;
+
+    return {
+        baseCurrency,
+        quoteCurrency,
+        amount,
+    };
+};
+
+export default connect(mapStateToProps)(Home);
