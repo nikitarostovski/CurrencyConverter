@@ -11,10 +11,6 @@ import { LastConverted } from '../components/Text';
 import { Header } from '../components/Header';
 import { swapCurrency, changeCurrencyAmount } from '../actions/currencies';
 
-const TEMP_QUOTE_PRICE = '679';
-const TEMP_CONVERSION_RATE = 67.9;
-const TEMP_CONVERSION_DATE = new Date();
-
 class Home extends Component {
 
     static propTypes = {
@@ -23,14 +19,18 @@ class Home extends Component {
         baseCurrency: PropTypes.string,
         quoteCurrency: PropTypes.string,
         amount: PropTypes.number,
+        conversionRate: PropTypes.number,
+        isFetching: PropTypes.bool,
+        lastConversionDate: PropTypes.object,
+        primaryColor: PropTypes.string,
     }
 
     handlePressBaseCurrency = () => {
-        this.props.navigation.navigate('CurrencyList', { title: 'Base Currency' });
+        this.props.navigation.navigate('CurrencyList', { title: 'Base Currency', type: 'base', });
     }
 
     handlePressQuoteCurrency = () => {
-        this.props.navigation.navigate('CurrencyList', { title: 'Quote Currency' });
+        this.props.navigation.navigate('CurrencyList', { title: 'Quote Currency', type: 'quote', });
     }
 
     handleTextChange = (text) => {
@@ -46,31 +46,41 @@ class Home extends Component {
     }
 
     render() {
+
+        let quotePrice = (this.props.amount * this.props.conversionRate).toFixed(2);
+
+        if (this.props.isFetching) {
+            quotePrice = '...';
+        }
+
         return (
-            <Container>
+            <Container backgroundColor={this.props.primaryColor}>
                 <StatusBar translucent={false} barStyle='light-content' />
                 <Header
                     onPress={this.handlePressSettings}
                 />
                 <KeyboardAvoidingView behavior="padding">
-                    <Logo />
+                    <Logo tintColor={this.props.primaryColor} />
                     <InputWithButton
                         defaultValue={this.props.amount.toString()}
                         buttonText={this.props.baseCurrency}
                         onPress={this.handlePressBaseCurrency}
                         onChangeText={this.handleTextChange}
                         keyboardType="numeric"
+                        textColor={this.props.primaryColor}
                     />
                     <InputWithButton
                         buttonText={this.props.quoteCurrency}
                         onPress={this.handlePressQuoteCurrency}
                         editable={false}
+                        value={quotePrice}
+                        textColor={this.props.primaryColor}
                     />
                     <LastConverted
                         base={this.props.baseCurrency}
                         quote={this.props.quoteCurrency}
-                        conversionRate={TEMP_CONVERSION_RATE}
-                        date={TEMP_CONVERSION_DATE}
+                        conversionRate={this.props.conversionRate}
+                        date={this.props.lastConversionDate}
                     />
                     <ClearButton
                         text="Reverse Currencies"
@@ -87,10 +97,18 @@ const mapStateToProps = (state) => {
     const quoteCurrency = state.currencies.quoteCurrency;
     const amount = state.currencies.amount;
 
+    const conversionSelector = state.currencies.conversions[baseCurrency] || {};
+    const rates = conversionSelector.rates || {};
+
+
     return {
         baseCurrency,
         quoteCurrency,
         amount,
+        conversionRate: rates[quoteCurrency] || 0,
+        isFetching: conversionSelector.isFetching,
+        lastConversionDate: conversionSelector.date ? new Date(conversionSelector.date) : new Date(),
+        primaryColor: state.theme.primaryColor,
     };
 };
 

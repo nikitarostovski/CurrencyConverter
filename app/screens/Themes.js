@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { ScrollView, StatusBar, Platform } from 'react-native';
-import Icon from 'react-native-ionicons'
 import PropTypes from 'prop-types';
 import { ListItem, Separator } from '../components/List';
 import EStyleSheet from 'react-native-extended-stylesheet';
+import { connect } from 'react-redux';
+
+import { changePrimaryColor } from '../actions/theme';
 
 const ICON_SIZE = 23;
 const ICON_COLOR = '#868686';
@@ -19,9 +21,11 @@ class Themes extends Component {
 
     static propTypes = {
         navigation: PropTypes.object,
+        dispatch: PropTypes.func,
     };
 
     handleThemeTap(color) {
+        this.props.dispatch(changePrimaryColor(color));
         this.props.navigation.goBack(null);
     }
 
@@ -66,4 +70,4 @@ class Themes extends Component {
     }
 }
 
-export default Themes;
+export default connect()(Themes);

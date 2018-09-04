@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import {
     ScrollView, StatusBar, Platform, Linking,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
 import { ListItem, Separator } from '../components/List';
 
 const ICON_PREFIX = Platform.OS === 'ios' ? 'ios' : 'md';
@@ -32,15 +31,13 @@ class Options extends Component {
                 <ListItem
                     text="Themes"
                     onPress={this.handlePressThemes}
-                    customIcon={
-                        <Icon name={`${ICON_PREFIX}-arrow-forward`} size={ICON_SIZE} color={ICON_COLOR} />
-                    }
+                    customIcon={null}
                 />
                 <Separator />
                 <ListItem
                     text="Handlebar Labs"
                     onPress={this.handlePressSite}
-                    customIcon={<Icon name={`${ICON_PREFIX}-link`} size={ICON_SIZE} color={ICON_COLOR} />}
+                    customIcon={null}
                 />
                 <Separator />
             </ScrollView>
